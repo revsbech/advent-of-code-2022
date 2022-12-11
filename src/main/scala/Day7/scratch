@@ -1,0 +1,138 @@
+  def parseLinesIntoNode(lines: List[String], curPath: List[String]): Dir = {
+    if (curPath.isEmpty == false) {
+
+      println("Entering parseLines into nodes with path " + curPath.reverse.mkString("/"))
+    }
+    val items: List[Node] = List.empty
+
+    val line = lines.head
+    val parts = line.split(" ")
+
+    // Should always be true...
+    if (parts(0) != "$") {
+      if (parts(1) == "cd") {
+        val dirName = parts(2) // First tile will be /
+        println(s" - CD'in into $dirName")
+        //Skip next two Will contain Liist("dir a", "14848514 b.txt", "8504156 c.dat", "dir d"
+        val itemLines = extractTillNextCommand(lines.tail.tail)
+
+        // Items will be List(File(b.txt), File(c.dat))
+        val items = itemLines.filter(l => l.split(" ")(0) != "dir").map(l => {
+          val lParts = l.split(" ")
+            File(parts(1), parts(0).toInt)
+        })
+
+        // Will containet List("$ cd a", "$ ls" ....)
+        val restOfLines = lines.takeRight(lines.length - itemLines.length + 2) // +2 from the cd and ls command
+        // Peek one forward, if next is cd .. then close current
+        if (restOfLines.tail.head == "cd .." || restOfLines.tail.isEmpty) {
+          // Return current
+          Dir(dirName, items)
+        } else {
+          // We should  now loop into the dir
+          val dir = parseLinesIntoNode(restOfLines, dirName :: curPath)
+          // Add to list
+        }
+
+        //Dir(parts(3), )
+      }
+    } else {
+
+    }
+
+
+
+    /*
+    val currentDir = curPath.head
+
+    val line = lines.head
+    println("--------------------------------------")
+    println("command: " + line)
+    val subDirs = List[Dir]
+    val files = List[File]
+    val parts = line.split(" ")
+    if (parts(0) != "$") {
+      // This is a file or a dir
+      if (parts(0) == "dir") {
+        // Ignore, this dir will be added later
+        //val dir = Dir(parts(1), List.empty, currentDir)
+        //parseLinesIntoNode(lines.tail, Some(Dir.addNode(currentDir.get, dir)))
+      } else {
+        // this is a file, append to current dir
+        val file = File(parts(1), parts(0).toInt)
+
+        //parseLinesIntoNode(lines.tail, Some(Dir.addNode(currentDir.get, file)))
+      }
+
+    }
+
+
+
+    println("--------------------------------------")
+
+    */
+
+
+    /*
+    if(lines == List.empty) {
+
+       currentDir.get
+    } else {
+      val line = lines.head
+      println("--------------------------------------")
+      if (!currentDir.isEmpty) {
+        println(s"Cur dir:  ${currentDir.get.name} with ${currentDir.get.items.length} items")
+      } else {
+        println("Cur dir: root/none")
+      }
+      println("command: " + line)
+
+      val parts = line.split(" ")
+      if (parts(0) == "$") {
+        // Commands ls and cd
+        if (parts(1) == "ls") {
+          // Just return the current, really just not used
+          parseLinesIntoNode(lines.tail, currentDir, curPath)
+        } else if (parts(1) == "cd") {
+          if (parts(2) == "..") {
+            // Go out one dir
+            parseLinesIntoNode(lines.tail, currentDir.get.parent, curPath.tail )
+          } else {
+            // cd into dir
+            println("CD into " + parts(2))
+            if (currentDir.isEmpty) {
+              // This is the root di!
+              val dir = Dir(parts(2), List.empty, currentDir)
+              parseLinesIntoNode(lines.tail, Some(dir), List(dir))
+            } else {
+              // Attach the new dir to the current, and traverse into it
+              // Die
+              val dir: Option[Dir] = currentDir.get.items.find(p => {
+                p match {
+                  case Dir(name, _, _) if (name == parts(2)) => true
+                  case _ => false
+                }
+              }).map(d => d.asInstanceOf[Dir]) // Here we hope that it existed...
+
+              parseLinesIntoNode(lines.tail, dir, dir :: curPath)
+            }
+          }
+        } else {
+          throw new RuntimeException(s"Unknown command $parts(1)")
+        }
+      } else {
+        // Loop through the entiries
+        if (parts(0) == "dir") {
+          // Ignore, this dir will be added later
+          val dir = Dir(parts(1), List.empty, currentDir)
+          parseLinesIntoNode(lines.tail, Some(Dir.addNode(currentDir.get, dir)))
+        } else {
+          // this is a file, append to current dir
+          val file = File(parts(1), parts(0).toInt)
+          parseLinesIntoNode(lines.tail, Some(Dir.addNode(currentDir.get, file)))
+        }
+      }
+    }
+
+     */
+  }
